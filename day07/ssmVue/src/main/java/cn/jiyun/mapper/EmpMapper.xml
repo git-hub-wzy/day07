@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jiyun.mapper.EmpMapper">
+	<select id="findPage" parameterType="empVo" resultType="empVo">
+		select e.*,d.name dname from emp e,dept d where e.did=d.id
+		<where>
+			<if test="name!=null and name!=''">
+				and e.name like '%${name}%'
+			</if>
+			<if test="age1!=null">
+				and e.age &gt;= #{age1}
+			</if>
+			<if test="age2!=null">
+				and e.age &lt;= #{age2}
+			</if>
+			<if test="birthday1!=null">
+				and e.birthday &lt;= #{birthday1}
+			</if>
+			<if test="birthday2!=null">
+				and e.birthday &lt;= #{birthday2}
+			</if>
+			<if test="did!=null and did!=0">
+				and e.did =#{did}
+			</if>
+		</where>
+	</select>
+	<insert id="addEmp" parameterType="emp">
+		insert into emp values(null,#{name},#{sex},#{age},#{birthday},#{did})
+	</insert>
+	<select id="findById" parameterType="int" resultType="emp">
+		select * form emp where id=#{id}
+	</select>
+	<update id="updateEmp" parameterType="emp">
+		update emp set name=#{name},sex=#{sex},age=#{age},birthday=#{birthday},did=#{did} where id=#{id}
+	</update>
+	<delete id="delEmp" parameterType="int">
+		delete from emp where id=#{id}
+	</delete>
+</mapper>

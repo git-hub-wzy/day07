@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="node_modules/vue/dist/vue.js"></script>
+    <script src="axios.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h1>人员列表展示</h1>
+        姓名:<input v-model="emp.name"><br>
+
+        年龄:<input v-model="emp.age1"><input v-model="emp.age2"><br>
+        生日:<input type="date" v-model="emp.birthday1">-<input type="date" v-model="emp.birthday2"><br>
+        部门:
+        <select v-model="emp.did">
+            <option value="0">--请选择--</option>
+            <option v-for="dept in deptList" :value="dept.id">{{dept.name}}</option>
+
+        </select>
+        <button @click="search">查询</button>
+        <a href="add1.html">添加</a>
+        <table border="1" cellspacing="0">
+            <tr>
+                <td>编号</td>
+                <td>姓名</td>
+                <td>性别</td>
+                <td>年龄</td>
+                <td>生日</td>
+                <td>部门</td>
+                <td>操作</td>
+
+            </tr>
+            <tr v-for="emp in page.list" :key="emp.id">
+                <td>{{emp.id}}</td>
+                <td>{{emp.name}}</td>
+                <td>{{emp.sex==1?'男':'女'}}</td>
+                <td>{{emp.age}}</td>
+                <td>{{formatter(emp.birthday,'yyyy-MM-dd')}}</td>
+                <td>{{emp.dname}}</td>
+                <td>
+                    <a href="javascript:void(0);" @click="toEdit(emo.id)">修改</a>
+                    <a href="javascript:void(0);" @click="del(emo.id)">删除</a>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+</body>
+<script>
+    var app = new Vue({
+        el:"#app",
+        data:{
+            empVo:{
+
+            },
+            deptList:[
+
+            ],
+            page:{
+                list:[]
+            }
+        },
+        methods:{
+            search(){
+
+               this.getData();
+            },
+            del(id) {
+                if (location.search != null) {
+                    axios.get("http://localhost:8080/ssmVue/emp/del.do?id" + id).then(function (res) {
+                        location.reload();
+                    });
+                }
+            },
+            toEdit(id){
+                location.href="add1.html?id"+id;
+
+            },
+            formatter (thistime, fmt){
+                let $this = new Date(thistime)
+                let o = {
+                    'M+': $this.getMonth() + 1,
+                    'd+': $this.getDate(),
+                    'h+': $this.getHours(),
+                    'm+': $this.getMinutes(),
+                    's+': $this.getSeconds(),
+                    'q+': Math.floor(($this.getMonth() + 3) / 3),
+                    'S': $this.getMilliseconds()
+                }
+                var fmt;
+                if (/(y+)/.test(fmt)) {
+                    fmt = fmt.replace(RegExp.$1, ($this.getFullYear() + '').substr(4 - RegExp.$1.length))
+                }
+                for (var k in o) {
+                    if (new RegExp('(' + k + ')').test(fmt)) {
+                        fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)))
+                    }
+                }
+                return fmt
+            },
+            getData() {
+                var that = this;
+                axios.post("http://localhost:8080/ssmVue/emp/findPage.do",this.empVo).then(function (res) {
+
+                    that.page=res.data;
+
+
+                });
+            }
+
+        },
+        created(){
+            var that = this;
+
+            this.getData();
+
+            axios.get("http://localhost:8080/ssmVue/dept/findDeptAll.do").then(function (res) {
+                that.deptList = res.data;
+            });
+        },
+
+
+    });
+
+</script>
+</html>
